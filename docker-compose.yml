@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount the database file and uploads folder so data persists on your host machine
+      - ./jobs.db:/app/jobs.db
+      - ./uploads:/app/uploads
+    environment:
+      # Use host.docker.internal to route requests from the container to your Windows host Ollama service
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3.2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Audio Transcriber & Coach</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js CDN for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Custom markdown formatting */
+        .markdown-body h1 { @apply text-2xl font-bold mb-4 mt-6 text-gray-900; }
+        .markdown-body h2 { @apply text-xl font-semibold mb-3 mt-5 text-gray-900 border-b pb-1; }
+        .markdown-body h3 { @apply text-lg font-medium mb-2 mt-4 text-gray-800; }
+        .markdown-body p { @apply mb-4 leading-relaxed text-gray-700; }
+        .markdown-body ul { @apply list-disc pl-6 mb-4 space-y-2 text-gray-700; }
+        .markdown-body ol { @apply list-decimal pl-6 mb-4 space-y-2 text-gray-700; }
+        .markdown-body li { @apply mb-1; }
+        .markdown-body strong { @apply font-semibold text-gray-900; }
+        .markdown-body blockquote { @apply border-l-4 border-indigo-500 pl-4 italic my-4 text-gray-600; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <!-- Microphone SVG Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">Interview Transcriber</h1>
+                    <p class="text-xs text-slate-500">Local AI Audio Transcription & Interview Coaching</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
+                    Local Backend Connected
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 overflow-hidden">
+        
+        <!-- Left Side: Upload & Job History -->
+        <section class="w-full lg:w-96 flex flex-col gap-6 flex-shrink-0">
+            
+            <!-- Upload Card -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 mb-4">Upload Audio File</h2>
+                
+                <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-indigo-500 cursor-pointer transition-colors">
+                    <input type="file" id="file-input" class="hidden" accept=".mp3,.wav,.m4a,.webm,.ogg" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-slate-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <span class="block text-sm font-medium text-slate-700">Drag and drop file here</span>
+                    <span class="block text-xs text-slate-500 mt-1">or click to browse files</span>
+                    <span class="block text-[10px] text-slate-400 mt-2">Supports MP3, WAV, M4A, WEBM, OGG</span>
+                </div>
+
+                <!-- Selected File Display -->
+                <div id="file-info" class="hidden mt-4 p-3 bg-slate-50 rounded-lg flex items-center justify-between border border-slate-200">
+                    <div class="flex items-center space-x-2 truncate">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
+                        <span id="filename-display" class="text-sm font-medium text-slate-700 truncate">audio_file.mp3</span>
+                    </div>
+                    <button id="cancel-selection" class="text-slate-400 hover:text-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- Job Description Input -->
+                <div class="mt-4">
+                    <label for="jd-input" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Job Description / Context (Optional)</label>
+                    <textarea id="jd-input" rows="3" class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 resize-y" placeholder="Paste the job description or interview context here to improve transcription accuracy and coaching feedback..."></textarea>
+                </div>
+
+                <button id="upload-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center justify-center space-x-2 disabled:opacity-50" disabled>
+                    <span>Start Processing</span>
+                </button>
+
+                <!-- Processing / Progress Loader -->
+                <div id="upload-progress-container" class="hidden mt-4">
+                    <div class="flex justify-between text-xs font-semibold text-indigo-600 mb-1">
+                        <span>Uploading file...</span>
+                        <span id="upload-progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-1.5">
+                        <div id="upload-progress-bar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job History Card -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex-1 flex flex-col min-h-[300px] overflow-hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-slate-900">Interview History</h2>
+                    <span id="history-count" class="text-xs font-semibold px-2 py-0.5 bg-slate-100 rounded-full text-slate-600">0</span>
+                </div>
+                
+                <!-- History List -->
+                <div id="history-list" class="flex-1 overflow-y-auto space-y-3 pr-1">
+                    <!-- Dynamically populated -->
+                    <div class="text-center py-8 text-slate-400 text-sm">
+                        No interview history found.
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Side: Analysis and Transcript Dashboard -->
+        <section class="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden min-h-[400px]">
+            
+            <!-- Default Placeholder State -->
+            <div id="empty-state" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <div class="p-4 bg-indigo-50 text-indigo-500 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-1">No Interview Selected</h3>
+                <p class="text-slate-500 max-w-md text-sm">
+                    Upload a recording to get started, or select a previous interview from the history to view the transcript and LLM analysis.
+                </p>
+            </div>
+
+            <!-- Job Active State (Spinner & Status) -->
+            <div id="loading-state" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/50">
+                <div class="relative flex items-center justify-center mb-6">
+                    <!-- Double Ring Spinner -->
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600"></div>
+                    <div class="absolute animate-ping rounded-full h-10 w-10 bg-indigo-100"></div>
+                </div>
+                <h3 id="loading-title" class="text-lg font-bold text-slate-900 mb-2">Analyzing Interview...</h3>
+                <p id="loading-desc" class="text-slate-500 max-w-md text-sm mb-4">
+                    Please keep this page open. The Whisper AI is transcribing the audio, and the local LLM will generate interview feedback shortly.
+                </p>
+                <div class="inline-flex px-3 py-1 bg-indigo-50 rounded-full text-indigo-700 text-xs font-semibold items-center">
+                    <span class="h-2 w-2 bg-indigo-500 rounded-full mr-2 animate-pulse"></span>
+                    Status: <span id="loading-status-text" class="ml-1 uppercase">Processing</span>
+                </div>
+            </div>
+
+            <!-- Job Failed State -->
+            <div id="error-state" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center bg-rose-50/30">
+                <div class="p-4 bg-rose-50 text-rose-500 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-rose-900 mb-1">Processing Failed</h3>
+                <p id="error-message-text" class="text-rose-700 max-w-md text-sm mb-4">
+                    An error occurred during transcription or analysis.
+                </p>
+                <button onclick="fetchHistory()" class="px-4 py-2 bg-rose-600 text-white text-sm font-medium rounded-lg hover:bg-rose-700 shadow transition-colors">
+                    Refresh Dashboard
+                </button>
+            </div>
+
+            <!-- Result Dashboard (Active when Job is Completed) -->
+            <div id="result-dashboard" class="hidden flex-1 flex flex-col overflow-hidden">
+                <!-- Dashboard Header -->
+                <div class="p-6 border-b border-slate-200 bg-white flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h2 id="result-title" class="text-xl font-bold text-slate-900 truncate max-w-lg">interview_recording.mp3</h2>
+                        <p id="result-date" class="text-xs text-slate-500 mt-0.5">Processed on Aug 20, 2026</p>
+                    </div>
+                    <div class="flex items-center space-x-3 flex-shrink-0">
+                        <button id="delete-btn" class="px-3 py-1.5 border border-slate-200 hover:border-red-200 hover:bg-red-55 text-xs font-medium rounded-lg text-slate-600 hover:text-red-600 transition-colors flex items-center space-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Delete Job</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="border-b border-slate-200 bg-slate-50 flex-shrink-0">
+                    <nav class="flex px-6 space-x-6" aria-label="Tabs">
+                        <button id="tab-analysis" class="border-indigo-600 text-indigo-600 border-b-2 py-4 px-1 text-sm font-semibold flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            <span>AI Coach Analysis</span>
+                        </button>
+                        <button id="tab-transcript" class="border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 border-b-2 py-4 px-1 text-sm font-semibold flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            <span>Transcript</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Collapsible JD display (only shown if job has JD) -->
+                <div id="jd-display-container" class="hidden px-6 py-2.5 bg-slate-50 border-b border-slate-200/50 flex-shrink-0">
+                    <details class="group">
+                        <summary class="text-xs font-semibold text-slate-500 cursor-pointer list-none flex items-center justify-between group-open:text-slate-800">
+                            <span class="flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Target Job Description (Applied)</span>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-open:rotate-180 transition-transform text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </summary>
+                        <div id="jd-display-text" class="mt-2 text-xs text-slate-600 bg-white p-3 rounded-lg border border-slate-200 whitespace-pre-wrap max-h-24 overflow-y-auto leading-relaxed">
+                            <!-- Job description text here -->
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Tab Panels -->
+                <div class="flex-1 overflow-y-auto p-6 bg-white">
+                    <!-- Analysis Tab Panel -->
+                    <div id="panel-analysis" class="markdown-body prose max-w-none">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Transcript Tab Panel -->
+                    <div id="panel-transcript" class="hidden text-slate-700 leading-relaxed max-w-none whitespace-pre-line text-sm">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+        <p>Interview Audio Transcriber &copy; 2026. Running completely local on Ashok.</p>
+    </footer>
+
+    <!-- App JavaScript -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
